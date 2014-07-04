@@ -11,7 +11,7 @@
   Created 14 6 2014
   Modified 22 6 2014
 */
-#include <UASensors_SDCard.h>
+#include <ARTF_SDCard.h>
 
 // UA Sensors SDCard - Dependencies
 #include <SdFat.h>
@@ -28,7 +28,7 @@ const int MESSAGE_SIZE = 101;
 #define FILENAME "testfile.txt"
 
 // Instantiate SDCard object. Need to call begin before using.
-UASensors_SDCard sd(CS_PIN);
+ARTF_SDCard sd(CS_PIN);
 
 
 // Menu options recognized from Serial input

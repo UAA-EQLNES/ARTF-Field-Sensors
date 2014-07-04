@@ -1,11 +1,11 @@
 // Implementation based on example code from Sparkfun: https://github.com/sparkfun/DeadOn_RTC
 
-#include <UASensors_RTC.h>
+#include <ARTF_RTC.h>
 #include <Arduino.h>
 #include <SPI.h>
 #include <String.h>
 
-void UASensors_RTC::begin()
+void ARTF_RTC::begin()
 {
     pinMode(_csPin, OUTPUT);
 
@@ -20,7 +20,7 @@ void UASensors_RTC::begin()
     delay(10);
 }
 
-void UASensors_RTC::setDateTime(int day, int month, int year, int hours, int minutes, int seconds)
+void ARTF_RTC::setDateTime(int day, int month, int year, int hours, int minutes, int seconds)
 {
     int timedate[7] = { seconds, minutes, hours, 0, day, month, year };
     for (int i = 0; i <= 6; ++i)
@@ -53,14 +53,14 @@ void UASensors_RTC::setDateTime(int day, int month, int year, int hours, int min
     }
 }
 
-String UASensors_RTC::readDateTimeAsText()
+String ARTF_RTC::readDateTimeAsText()
 {
     time_t timestamp = readDateTime();
     return String(year(timestamp)) + "-" + String(month(timestamp)) + "-" + String(day(timestamp)) + " " +
         String(hour(timestamp)) + ":" + String(minute(timestamp)) + ":" + String(second(timestamp));
 }
 
-time_t UASensors_RTC::readDateTime()
+time_t ARTF_RTC::readDateTime()
 {
     int timedate[7];
     for (int i = 0; i <= 6; ++i)

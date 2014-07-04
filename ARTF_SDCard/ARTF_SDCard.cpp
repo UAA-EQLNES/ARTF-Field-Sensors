@@ -1,14 +1,14 @@
-#include <UASensors_SDCard.h>
+#include <ARTF_SDCard.h>
 #include <Arduino.h>
 #include <SdFat.h>
 #include <String.h>
 
-void UASensors_SDCard::begin()
+void ARTF_SDCard::begin()
 {
     _sd.begin(_csPin, SPI_FULL_SPEED);
 }
 
-bool UASensors_SDCard::writeFile(char *filename, String data)
+bool ARTF_SDCard::writeFile(char *filename, String data)
 {
     if (_file.open(filename, O_RDWR | O_CREAT | O_AT_END))
     {
@@ -22,7 +22,7 @@ bool UASensors_SDCard::writeFile(char *filename, String data)
     }
 }
 
-String UASensors_SDCard::readFile(char *filename)
+String ARTF_SDCard::readFile(char *filename)
 {
     char c;
     String buffer = "";

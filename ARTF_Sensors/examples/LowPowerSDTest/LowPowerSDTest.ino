@@ -15,9 +15,9 @@
 
 #include <LowPower.h>
 
-#include <UASensors_SDCard.h>
+#include <ARTF_SDCard.h>
 
-// UASensors SDCard Dependency
+// ARTF SDCard Dependency
 #include <SdFat.h>
 
 
@@ -28,7 +28,7 @@ const byte SD_CS_PIN = 10;
 #define TEST_FILENAME "test.txt"
 
 int wakeupCount = 0;
-UASensors_SDCard sd(SD_CS_PIN);
+ARTF_SDCard sd(SD_CS_PIN);
 
 
 void setup()

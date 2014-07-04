@@ -16,7 +16,7 @@
 
 #include <LowPower.h>
 
-#include <UASensors_Sim900.h>
+#include <ARTF_Sim900.h>
 
 
 // LED blink settings
@@ -32,7 +32,7 @@ const int SEND_DATA_EVERY_X_WAKEUPS = 5;
 
 
 int wakeupCount = 0;
-UASensors_Sim900 sim900;
+ARTF_Sim900 sim900;
 
 
 void setup()

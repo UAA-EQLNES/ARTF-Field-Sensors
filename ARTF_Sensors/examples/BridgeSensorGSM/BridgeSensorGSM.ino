@@ -1,7 +1,7 @@
 /*
   Bridge Sensor with GSM, SDCard, and RTC
 
-  Sketch used by UA Sensors platform.
+  Sketch used by ARTF Sensors platform.
 
   Created 14 6 2014
   Modified 2 7 2014
@@ -10,16 +10,16 @@
 #include <LowPower.h>
 #include <math.h>
 
-#include <UASensors_Sim900.h>
-#include <UASensors_SDCard.h>
-#include <UASensors_RTC.h>
+#include <ARTF_Sim900.h>
+#include <ARTF_SDCard.h>
+#include <ARTF_RTC.h>
 
 
-// UASensors SDCard Dependency
+// ARTF SDCard Dependency
 #include <SdFat.h>
 #include <String.h>
 
-// UASensors RTC Dependency
+// ARTF RTC Dependency
 #include <SPI.h>
 #include <Time.h>
 
@@ -69,9 +69,9 @@ typedef struct {
 int numCachedReadings = 0;
 int totalReadings = 0;
 SensorReading sensorReadings[SEND_DATA_AFTER_X_READINGS];
-UASensors_Sim900 sim900;
-UASensors_RTC rtc(RTC_CS_PIN);
-UASensors_SDCard sd(SD_CS_PIN);
+ARTF_Sim900 sim900;
+ARTF_RTC rtc(RTC_CS_PIN);
+ARTF_SDCard sd(SD_CS_PIN);
 
 
 void setup()

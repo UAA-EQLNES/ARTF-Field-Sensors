@@ -11,7 +11,7 @@
   Modified 22 6 2014
 */
 #include <SoftwareSerial.h>
-#include <UASensors_Sim900.h>
+#include <ARTF_Sim900.h>
 
 // UA Sensors Sim900 - Dependencies
 #include <String.h>
@@ -24,7 +24,7 @@
 
 
 // Instantiate Sim900 object. Need to call begin before using.
-UASensors_Sim900 sim900;
+ARTF_Sim900 sim900;
 
 // GSM Shield uses software serial on pins 7, 8. Need to
 // switch jumpers and do some soldering to enable software serial.

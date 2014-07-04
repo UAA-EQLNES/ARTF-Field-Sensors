@@ -1,14 +1,14 @@
-#include "UASensors_Sim900.h"
+#include "ARTF_Sim900.h"
 #include <Arduino.h>
 #include <String.h>
 
-void UASensors_Sim900::begin(Stream *serial)
+void ARTF_Sim900::begin(Stream *serial)
 {
     _serial = serial;
     _powerStatus = POWER_OFFLINE;
 }
 
-void UASensors_Sim900::togglePower()
+void ARTF_Sim900::togglePower()
 {
   digitalWrite(POWER_PIN, HIGH);
   delay(1000);
@@ -16,17 +16,17 @@ void UASensors_Sim900::togglePower()
   delay(1000);
 }
 
-bool UASensors_Sim900::ensureReady()
+bool ARTF_Sim900::ensureReady()
 {
     return _ensurePowerStatus(POWER_READY, MAX_POWER_RETRIES);
 }
 
-bool UASensors_Sim900::ensureOffline()
+bool ARTF_Sim900::ensureOffline()
 {
     return _ensurePowerStatus(POWER_OFFLINE, MAX_POWER_RETRIES);
 }
 
-bool UASensors_Sim900::_ensurePowerStatus(int status, int maxRetries)
+bool ARTF_Sim900::_ensurePowerStatus(int status, int maxRetries)
 {
     bool success = false;
     int retries = 0;
@@ -49,27 +49,27 @@ bool UASensors_Sim900::_ensurePowerStatus(int status, int maxRetries)
     return success;
 }
 
-bool UASensors_Sim900::isReady()
+bool ARTF_Sim900::isReady()
 {
     return _powerStatus == POWER_READY;
 }
 
-bool UASensors_Sim900::isOffline()
+bool ARTF_Sim900::isOffline()
 {
     return  _powerStatus == POWER_OFFLINE;
 }
 
-bool UASensors_Sim900::isUnknownState()
+bool ARTF_Sim900::isUnknownState()
 {
     return  _powerStatus == POWER_UNKNOWN;
 }
 
-void UASensors_Sim900::waitPowerToggleCompleted()
+void ARTF_Sim900::waitPowerToggleCompleted()
 {
     waitPowerToggleCompleted(DEFAULT_POWER_TIMEOUT);
 }
 
-void UASensors_Sim900::waitPowerToggleCompleted(int timeout)
+void ARTF_Sim900::waitPowerToggleCompleted(int timeout)
 {
     char gsmReady[] = "Call Ready";
     char gsmReadyLength = 10;
@@ -117,12 +117,12 @@ void UASensors_Sim900::waitPowerToggleCompleted(int timeout)
     _powerStatus = POWER_UNKNOWN;
 }
 
-bool UASensors_Sim900::isTextMsgDelivered()
+bool ARTF_Sim900::isTextMsgDelivered()
 {
     return isTextMsgDelivered(DEFAULT_SMS_TIMEOUT);
 }
 
-bool UASensors_Sim900::isTextMsgDelivered(int timeout)
+bool ARTF_Sim900::isTextMsgDelivered(int timeout)
 {
     char smsOK[] = "OK";
     int smsOKLength = 2;
@@ -175,7 +175,7 @@ bool UASensors_Sim900::isTextMsgDelivered(int timeout)
     return false;
 }
 
-void UASensors_Sim900::clearBuffer()
+void ARTF_Sim900::clearBuffer()
 {
     char c;
     while (_serial->available() > 0)
@@ -184,7 +184,7 @@ void UASensors_Sim900::clearBuffer()
     }
 }
 
-void UASensors_Sim900::sendTextMsg(String msg, String phoneNumber)
+void ARTF_Sim900::sendTextMsg(String msg, String phoneNumber)
 {
     _serial->print("AT+CMGF=1\r");
     delay(500);
@@ -199,17 +199,17 @@ void UASensors_Sim900::sendTextMsg(String msg, String phoneNumber)
     delay(500);
 }
 
-int UASensors_Sim900::read()
+int ARTF_Sim900::read()
 {
     return _serial->read();
 }
 
-int UASensors_Sim900::available()
+int ARTF_Sim900::available()
 {
     return _serial->available();
 }
 
-void UASensors_Sim900::writeAtCommand(String command)
+void ARTF_Sim900::writeAtCommand(String command)
 {
     _serial->println(command);
     delay(100);

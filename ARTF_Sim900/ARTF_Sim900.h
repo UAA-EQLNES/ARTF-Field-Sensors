@@ -1,10 +1,10 @@
-#ifndef _UASENSORS_SIM900_H_
-#define _UASENSORS_SIM900_H_
+#ifndef _ARTF_SIM900_H_
+#define _ARTF_SIM900_H_
 
 #include <Arduino.h>
 #include <String.h>
 
-class UASensors_Sim900 {
+class ARTF_Sim900 {
 public:
     static const int POWER_PIN = 9;
     static const int MAX_POWER_RETRIES = 4;

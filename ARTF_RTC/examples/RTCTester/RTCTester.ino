@@ -10,7 +10,7 @@
   Created 14 6 2014
   Modified 22 6 2014
 */
-#include <UASensors_RTC.h>
+#include <ARTF_RTC.h>
 
 // UA Sensors RTC - Dependencies
 #include <SPI.h>
@@ -20,7 +20,7 @@
 const int CS_PIN = 8;
 
 // Instantiate RTC object with CS Pin. Need to call begin before using.
-UASensors_RTC rtc(CS_PIN);
+ARTF_RTC rtc(CS_PIN);
 
 
 // Menu options recognized from Serial input
