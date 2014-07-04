@@ -9,7 +9,7 @@
 
 The following are descriptions of the example sketches and their purpose:
 
-#### UA_Sensors
+#### ARTF\_Sensors
 
 - **BridgeSensorGSM** - Full sketch that utilizes all features of the sensor platform
 - **BasicUltrasonic** - Used to verify readings from Ultrasonic senor
@@ -19,14 +19,14 @@ The following are descriptions of the example sketches and their purpose:
 - **LowPowerUltrasonicTest** - Verifies that the Ultrasonic sensor works on the sensor platform
 - **Sim900CmdConsole** - A simple serial console to send AT commands to GSM shield
 
-#### UA\_Sensors\_RTC
+#### ARTF\_RTC
 
 - **RTCTester** - Read/Set time on RTC board
 
-#### UA\_Sensors\_SDCard
+#### ARTF\_SDCard
 
 - **SDCardTester** - Read/Write text to SD Card
 
-#### UA\_Sensors\_Sim900
+#### ARTF\_Sim900
 
 - **Sim900Tester** - Verifies that the power functions and SMS messaging works
