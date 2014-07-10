@@ -39,7 +39,7 @@ void loop()
     Serial.print(". Analog:");
     Serial.print(reading);
     Serial.print("; Percent:");
-    Serial.print(((double)reading / (double)MOISTURE_MAX_READING));
+    Serial.println(((double)reading / (double)MOISTURE_MAX_READING));
 
     delay(300);
   }

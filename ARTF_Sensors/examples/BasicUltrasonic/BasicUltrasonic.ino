@@ -39,7 +39,7 @@ void loop()
     Serial.print(". Analog:");
     Serial.print(reading);
     Serial.print("; Calculated:");
-    Serial.print(reading * DISTANCE_INCREMENT);
+    Serial.println(reading * DISTANCE_INCREMENT);
 
     delay(300);
   }
