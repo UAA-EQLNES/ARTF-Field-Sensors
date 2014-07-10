@@ -40,8 +40,8 @@
 
 // Settings
 // -------------------------------
-#define SENSOR_TO_RIVER_BED        2000
 #define SENSOR_TYPE                "d"
+#define SENSOR_TO_RIVER_BED        0
 #define SEND_DATA_AFTER_X_READINGS 10
 #define SLEEP_CYCLES               4
 #define NUM_THERM_READINGS         5
@@ -168,7 +168,11 @@ void loop()
 
   // 11. Use average temperature to calculate actual distance.
   // ---------------------------------------------------------
-  double adjustedDistance = SENSOR_TO_RIVER_BED - ( ( 331.1 + .6 * avgTemperature ) / 344.5 ) * avgDistance;
+  double adjustedDistance = ( ( 331.1 + .6 * avgTemperature ) / 344.5 ) * avgDistance;
+  if (SENSOR_TO_RIVER_BED > 0)
+  {
+    adjustedDistance = SENSOR_TO_RIVER_BED - adjustedDistance;
+  }
 
   int roundedDistance = round(adjustedDistance);
   int roundedTemperature = round(avgTemperature);
