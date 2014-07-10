@@ -48,6 +48,7 @@
 #define THERM_READING_DELAY        20
 #define NUM_DISTANCE_READINGS      3
 #define DISTANCE_READING_DELAY     200
+#define DISTANCE_INCREMENT         5
 #define DATA_DELIM                 ';'
 #define BACKUP_FILENAME            "backup.txt"
 #define UNSENT_FILENAME            "unsent.txt"
@@ -144,7 +145,7 @@ void loop()
   int distanceReadings[NUM_DISTANCE_READINGS];
   for (int i = 0; i < NUM_DISTANCE_READINGS; ++i)
   {
-    distanceReadings[i] = analogRead(ULTRASONIC_PIN);
+    distanceReadings[i] = analogRead(ULTRASONIC_PIN) * DISTANCE_INCREMENT;
     delay(DISTANCE_READING_DELAY);
   }
 
