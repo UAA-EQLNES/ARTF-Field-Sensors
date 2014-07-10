@@ -50,9 +50,9 @@ void loop()
   output += "Trial " + String(count) + "\n";
   output += "-------------------\n";
 
+
   digitalWrite(MOSFET_US_PIN, HIGH);
   delay(3000);
-
 
   // Take X readings
   int distanceReadings[NUM_READINGS];
@@ -69,6 +69,7 @@ void loop()
   digitalWrite(MOSFET_US_PIN, LOW);
   delay(500);
 
+
   // Average the readings
   double sumDistance = 0.0;
   for (int i = 0; i < NUM_READINGS; ++i)
@@ -81,9 +82,6 @@ void loop()
   int roundedDistance = round(avgDistance);
 
   output += "Rounded:" + String(roundedDistance) + "\n\n";
-
-
-
 
   sd.begin();
   sd.writeFile(OUTPUT_FILENAME, output);
