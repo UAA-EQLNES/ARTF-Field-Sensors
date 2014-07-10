@@ -22,6 +22,7 @@
 
 // Ultrasonic Settings
 const byte ULTRASONIC_PIN = A6;
+const byte MOSFET_US_PIN = 5;
 const int DISTANCE_INCREMENT = 5;
 const int NUM_READINGS = 5;
 
@@ -49,6 +50,10 @@ void loop()
   output += "Trial " + String(count) + "\n";
   output += "-------------------\n";
 
+  digitalWrite(MOSFET_US_PIN, HIGH);
+  delay(3000);
+
+
   // Take X readings
   int distanceReadings[NUM_READINGS];
   for (int i = 0; i < NUM_READINGS; ++i)
@@ -60,6 +65,9 @@ void loop()
 
     delay(300);
   }
+
+  digitalWrite(MOSFET_US_PIN, LOW);
+  delay(500);
 
   // Average the readings
   double sumDistance = 0.0;
@@ -73,6 +81,9 @@ void loop()
   int roundedDistance = round(avgDistance);
 
   output += "Rounded:" + String(roundedDistance) + "\n\n";
+
+
+
 
   sd.begin();
   sd.writeFile(OUTPUT_FILENAME, output);
