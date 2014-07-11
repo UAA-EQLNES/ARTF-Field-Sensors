@@ -62,7 +62,7 @@ void loop()
     int reading = analogRead(MOISTURE_PIN);
     moistureReadings[i] = (double)reading / (double)MOISTURE_MAX_READING;
 
-    output += String(i) + ". Analog:" + String(reading) + "; Calculated:" + String(moistureReadings[i]) + "\n";
+    output += String(i) + ". Analog:" + String(reading) + "; Calculated:" + String((int)(moistureReadings[i] * 100)) + "\n";
 
     delay(300);
   }
