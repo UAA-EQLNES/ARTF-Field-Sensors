@@ -8,8 +8,8 @@
   help verify similar calculations used in MoistureSensorGSM
   sketch. The results are written to the SD card
 
-  Created 10 7 2014
-  Modified 10 7 2014
+  Created 11 7 2014
+  Modified 11 7 2014
 */
 #include <LowPower.h>
 
@@ -29,7 +29,7 @@ const int MOISTURE_MAX_READING = 600;
 
 // SD Card Settings
 const byte SD_CS_PIN = 10;
-#define OUTPUT_FILENAME "ultra.txt"
+#define OUTPUT_FILENAME "veg.txt"
 
 
 ARTF_SDCard sd(SD_CS_PIN);
@@ -56,7 +56,7 @@ void loop()
   delay(3000);
 
   // Take X readings
-  int moistureReadings[NUM_READINGS];
+  double moistureReadings[NUM_READINGS];
   for (int i = 0; i < NUM_READINGS; ++i)
   {
     int reading = analogRead(MOISTURE_PIN);
