@@ -6,9 +6,11 @@
   Notes:
   - This is an early implementation. Parts of code need to be cleaned up
     to remove duplication. But should work for now.
+  - Use 930 MOISTURE_MAX_READING for 3.3v Arduino. About 610 for 5v Arduino
+  - Had to remove RTC time for sample GSM message. Red light on RocketScream stays on...
 
   Created 8 7 2014
-  Modified 8 7 2014
+  Modified 11 7 2014
 */
 
 #include <LowPower.h>
@@ -43,7 +45,7 @@
 // Settings
 // -------------------------------
 #define SENSOR_TYPE                "s"
-#define MOISTURE_MAX_READING       450
+#define MOISTURE_MAX_READING       930
 #define SEND_DATA_AFTER_X_READINGS 3
 #define SLEEP_CYCLES               3600
 #define NUM_MOISTURE_READINGS      10
@@ -84,11 +86,7 @@ void setup()
   // 0. Send a test text message with with moisture reading and time
   // ---------------------------------------------------------------
   int roundedMoisture = takeMoistureReadings();
-
-  rtc.begin();
-  time_t unixTime = rtc.readDateTime();
-
-  String textMessage = String(SENSOR_TYPE) + " " + String(unixTime) + " " + String(roundedMoisture);
+  String textMessage = String(SENSOR_TYPE) + " " + String(roundedMoisture);
 
   digitalWrite(MOSFET_GSM_PIN, HIGH);
   delay(1500);
@@ -105,6 +103,7 @@ void setup()
 
   digitalWrite(MOSFET_GSM_PIN, LOW);
   delay(2000);
+
 }
 
 
@@ -230,7 +229,7 @@ int takeMoistureReadings()
   // --------------------------------------
   digitalWrite(MOSFET_MS_PIN, HIGH);
   // Calibration time
-  delay(1000);
+  delay(2000);
 
 
   // 3. Take X moisture readings. (One every 200ms)
