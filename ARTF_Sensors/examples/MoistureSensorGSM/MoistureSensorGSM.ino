@@ -86,7 +86,7 @@ void setup()
   // 0. Send a test text message with with moisture reading and time
   // ---------------------------------------------------------------
   int roundedMoisture = takeMoistureReadings();
-  String textMessage = String(SENSOR_TYPE) + " " + String(roundedMoisture);
+  String textMessage = "Test: " + String(SENSOR_TYPE) + " " + String(roundedMoisture);
 
   digitalWrite(MOSFET_GSM_PIN, HIGH);
   delay(1500);
