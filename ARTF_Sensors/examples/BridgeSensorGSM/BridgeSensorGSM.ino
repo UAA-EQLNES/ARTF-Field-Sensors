@@ -4,7 +4,7 @@
   Sketch used by ARTF Sensors platform.
 
   Created 14 6 2014
-  Modified 10 7 2014
+  Modified 13 7 2014
 */
 
 #include <LowPower.h>
@@ -41,9 +41,9 @@
 // Settings
 // -------------------------------
 #define SENSOR_TYPE                "d"
-#define SENSOR_TO_RIVER_BED        0
-#define SEND_DATA_AFTER_X_READINGS 10
-#define SLEEP_CYCLES               4
+#define SENSOR_TO_RIVER_BED        1100
+#define SEND_DATA_AFTER_X_READINGS 12
+#define SLEEP_CYCLES               900
 #define NUM_THERM_READINGS         5
 #define THERM_READING_DELAY        20
 #define NUM_DISTANCE_READINGS      3
@@ -56,6 +56,8 @@
 #define PHONE_NUMBER               "+12223334444"
 #define ERROR_GSM                  "GSM Failed"
 #define ERROR_SMS                  "SMS Failed"
+
+#define TEST_PHONE_NUMBER          "+12223334444"
 
 
 // Custom Datatypes
@@ -80,6 +82,36 @@ void setup()
   pinMode(SD_CS_PIN, OUTPUT);
   pinMode(THERM_PIN, OUTPUT);
   sim900.begin(&Serial);
+
+
+  // 0. Send a test text message with temperature and distance readings
+  // ------------------------------------------------------------------
+  double temperature = takeThermReading();
+  double distance = takeDistanceReading(temperature);
+  int roundedTemperature = round(temperature);
+  int roundedDistance = round(distance);
+
+  String textMessage = "Test: " +
+    String(SENSOR_TYPE) + " " +
+    String(roundedTemperature) + " " +
+    String(roundedDistance);
+
+  digitalWrite(MOSFET_GSM_PIN, HIGH);
+  delay(1500);
+
+  Serial.begin(19200);
+  delay(100);
+
+  if (sim900.ensureReady() == true)
+  {
+    sim900.sendTextMsg(textMessage, TEST_PHONE_NUMBER);
+    sim900.isTextMsgDelivered();
+  }
+  sim900.ensureOffline();
+
+  digitalWrite(MOSFET_GSM_PIN, LOW);
+  delay(2000);
+
 }
 
 
@@ -96,86 +128,14 @@ void loop()
     LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
   }
 
-  // 2. Turn on thermistor.
-  // ----------------------
-  digitalWrite(THERM_PIN, HIGH);
+  // Steps 2-6
+  double temperature = takeThermReading();
 
-  // 3. Take 5 thermistor readings. (one every 20ms)
-  // -----------------------------------------------
-  int thermReadings[NUM_THERM_READINGS];
-  for (int i = 0; i < NUM_THERM_READINGS; ++i)
-  {
-    thermReadings[i] = analogRead(THERMISTOR_PIN);
-    delay(THERM_READING_DELAY);
-  }
+  // Steps 7-11
+  double distance = takeDistanceReading(temperature);
 
-  // 4. Turn off thermistor.
-  // -----------------------
-  digitalWrite(THERM_PIN, LOW);
-  delay(500);
-
-  // 5. Average 5 thermistor readings.
-  // ---------------------------------
-  double sumTherm = 0;
-  for (int i = 0; i < NUM_THERM_READINGS; ++i)
-  {
-    sumTherm += thermReadings[i];
-  }
-  double avgTherm = sumTherm / NUM_THERM_READINGS;
-  avgTherm = 1023 / avgTherm - 1;
-  double R = 10000 / avgTherm;
-
-
-  // 6. Convert average thermistor reading into temperature.
-  // -------------------------------------------------------
-
-  // Steinhart-Hart, modified:
-  double avgTemperature = ( 3950.0 / (log( R / (10000.0 * exp( -3950.0 / 298.13 ) ) ) ) ) - 273.13;
-
-
-  // 7. Turn on ultrasonic sensor (MOSFET).
-  // --------------------------------------
-  digitalWrite(MOSFET_US_PIN, HIGH);
-  // Calibration time
-  delay(3000);
-
-
-  // 8. Take 3 distance readings. (One every 200ms)
-  // ----------------------------------------------
-  int distanceReadings[NUM_DISTANCE_READINGS];
-  for (int i = 0; i < NUM_DISTANCE_READINGS; ++i)
-  {
-    distanceReadings[i] = analogRead(ULTRASONIC_PIN) * DISTANCE_INCREMENT;
-    delay(DISTANCE_READING_DELAY);
-  }
-
-
-  // 9. Turn off ultrasonic sensor (MOSFET).
-  // ---------------------------------------
-  digitalWrite(MOSFET_US_PIN, LOW);
-  delay(500);
-
-
-  // 10. Average 3 distance measurements.
-  // ------------------------------------
-  double sumDistance = 0.0;
-  for (int i = 0; i < NUM_DISTANCE_READINGS; ++i)
-  {
-    sumDistance += distanceReadings[i];
-  }
-  double avgDistance = sumDistance / NUM_DISTANCE_READINGS;
-
-
-  // 11. Use average temperature to calculate actual distance.
-  // ---------------------------------------------------------
-  double adjustedDistance = ( ( 331.1 + .6 * avgTemperature ) / 344.5 ) * avgDistance;
-  if (SENSOR_TO_RIVER_BED > 0)
-  {
-    adjustedDistance = SENSOR_TO_RIVER_BED - adjustedDistance;
-  }
-
-  int roundedDistance = round(adjustedDistance);
-  int roundedTemperature = round(avgTemperature);
+  int roundedTemperature = round(temperature);
+  int roundedDistance = round(distance);
 
 
   // 12. Get time from RTC Shield.
@@ -278,4 +238,91 @@ void loop()
     digitalWrite(MOSFET_GSM_PIN, LOW);
     delay(2000);
   }
+}
+
+double takeThermReading()
+{
+  // 2. Turn on thermistor.
+  // ----------------------
+  digitalWrite(THERM_PIN, HIGH);
+
+  // 3. Take 5 thermistor readings. (one every 20ms)
+  // -----------------------------------------------
+  int thermReadings[NUM_THERM_READINGS];
+  for (int i = 0; i < NUM_THERM_READINGS; ++i)
+  {
+    thermReadings[i] = analogRead(THERMISTOR_PIN);
+    delay(THERM_READING_DELAY);
+  }
+
+  // 4. Turn off thermistor.
+  // -----------------------
+  digitalWrite(THERM_PIN, LOW);
+  delay(500);
+
+  // 5. Average 5 thermistor readings.
+  // ---------------------------------
+  double sumTherm = 0;
+  for (int i = 0; i < NUM_THERM_READINGS; ++i)
+  {
+    sumTherm += thermReadings[i];
+  }
+  double avgTherm = sumTherm / NUM_THERM_READINGS;
+  avgTherm = 1023 / avgTherm - 1;
+  double R = 10000 / avgTherm;
+
+
+  // 6. Convert average thermistor reading into temperature.
+  // -------------------------------------------------------
+
+  // Steinhart-Hart, modified:
+  double avgTemperature = ( 3950.0 / (log( R / (10000.0 * exp( -3950.0 / 298.13 ) ) ) ) ) - 273.13;
+
+  return avgTemperature;
+}
+
+double takeDistanceReading(double temperature)
+{
+  // 7. Turn on ultrasonic sensor (MOSFET).
+  // --------------------------------------
+  digitalWrite(MOSFET_US_PIN, HIGH);
+  // Calibration time
+  delay(3000);
+
+
+  // 8. Take 3 distance readings. (One every 200ms)
+  // ----------------------------------------------
+  int distanceReadings[NUM_DISTANCE_READINGS];
+  for (int i = 0; i < NUM_DISTANCE_READINGS; ++i)
+  {
+    distanceReadings[i] = analogRead(ULTRASONIC_PIN) * DISTANCE_INCREMENT;
+    delay(DISTANCE_READING_DELAY);
+  }
+
+
+  // 9. Turn off ultrasonic sensor (MOSFET).
+  // ---------------------------------------
+  digitalWrite(MOSFET_US_PIN, LOW);
+  delay(500);
+
+
+  // 10. Average 3 distance measurements.
+  // ------------------------------------
+  double sumDistance = 0.0;
+  for (int i = 0; i < NUM_DISTANCE_READINGS; ++i)
+  {
+    sumDistance += distanceReadings[i];
+  }
+  double avgDistance = sumDistance / NUM_DISTANCE_READINGS;
+
+
+  // 11. Use average temperature to calculate actual distance.
+  // ---------------------------------------------------------
+  double adjustedDistance = ( ( 331.1 + .6 * temperature ) / 344.5 ) * avgDistance;
+  if (SENSOR_TO_RIVER_BED > 0)
+  {
+    adjustedDistance = SENSOR_TO_RIVER_BED - adjustedDistance;
+  }
+
+  return adjustedDistance;
 }

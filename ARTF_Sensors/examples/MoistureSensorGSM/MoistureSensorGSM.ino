@@ -10,7 +10,7 @@
   - Had to remove RTC time for sample GSM message. Red light on RocketScream stays on...
 
   Created 8 7 2014
-  Modified 11 7 2014
+  Modified 13 7 2014
 */
 
 #include <LowPower.h>
@@ -83,7 +83,7 @@ void setup()
   delay(300);
 
 
-  // 0. Send a test text message with with moisture reading and time
+  // 0. Send a test text message with moisture reading and time
   // ---------------------------------------------------------------
   int roundedMoisture = takeMoistureReadings();
   String textMessage = "Test: " + String(SENSOR_TYPE) + " " + String(roundedMoisture);
