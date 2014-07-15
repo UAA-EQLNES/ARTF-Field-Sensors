@@ -4,7 +4,7 @@
   Sketch used by ARTF Sensors platform.
 
   Created 14 6 2014
-  Modified 13 7 2014
+  Modified 15 7 2014
 */
 
 #include <LowPower.h>
@@ -69,6 +69,7 @@ typedef struct {
 
 
 // Global Variables
+int sleepCount = 0;
 int numCachedReadings = 0;
 int totalReadings = 0;
 SensorReading sensorReadings[SEND_DATA_AFTER_X_READINGS];
@@ -120,13 +121,13 @@ void loop()
 
   // 1. Wake up.
   // -----------
-
-  // Enter idle state for 8 s with the rest of peripherals turned off.
-  // 98 sleep cycles will take a reading approximately every 13 minutes.
-  for (int i = 0; i < SLEEP_CYCLES; ++i)
+  LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+  if (sleepCount < SLEEP_CYCLES)
   {
-    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+    sleepCount += 1;
+    return;
   }
+  sleepCount = 0;
 
   // Steps 2-6
   double temperature = takeThermReading();
@@ -159,23 +160,13 @@ void loop()
   numCachedReadings += 1;
 
 
-  // 14. Turn on SD Card.
-  // 15. Save data string to text file on SD card: "1399506809 1000 100" (roughly 20 characters)
-  // -------------------------------------------------------------------------------------------
-
-  // Try to turn on SD card. Should only need to be called once.
-  sd.begin();
-  sd.writeFile(BACKUP_FILENAME, dataString);
-  delay(1000);
-
-
-  // 16. Are there 4 unsent data strings?
-  // 17. Yes. Send 4 unsent data strings in one SMS. Go to 18.
+  // 14. Are there 4 unsent data strings?
+  // 15. Yes. Send 4 unsent data strings in one SMS. Go to 18.
   // -------------------------------------
   if (numCachedReadings == SEND_DATA_AFTER_X_READINGS)
   {
 
-    // 18. Prepare text message
+    // 16. Prepare text message
     // ---------------------
     String textMessage = String(SENSOR_TYPE) + " " +
       String(sensorReadings[0].timestamp) + " " +
@@ -202,7 +193,7 @@ void loop()
     delay(100);
 
 
-    // 20. Send text message if GSM Ready
+    // 17. Send text message if GSM Ready
     if (sim900.ensureReady() == true)
     {
       sim900.sendTextMsg(textMessage, PHONE_NUMBER);
@@ -224,7 +215,7 @@ void loop()
     numCachedReadings = 0;
 
 
-    // 20. Turn off GSM.
+    // 18. Turn off GSM.
     // -----------------
 
     if (sim900.ensureOffline() == false)
@@ -238,6 +229,16 @@ void loop()
     digitalWrite(MOSFET_GSM_PIN, LOW);
     delay(2000);
   }
+
+
+  // 19. Turn on SD Card.
+  // 20. Save data string to text file on SD card: "1399506809 1000 100" (roughly 20 characters)
+  // -------------------------------------------------------------------------------------------
+
+  // Try to turn on SD card. Should only need to be called once.
+  sd.begin();
+  sd.writeFile(BACKUP_FILENAME, dataString);
+  delay(1500);
 }
 
 double takeThermReading()

@@ -10,7 +10,7 @@
   - Had to remove RTC time for sample GSM message. Red light on RocketScream stays on...
 
   Created 8 7 2014
-  Modified 13 7 2014
+  Modified 15 7 2014
 */
 
 #include <LowPower.h>
@@ -68,6 +68,7 @@ typedef struct {
 
 
 // Global Variables
+int sleepCount = 0;
 int numCachedReadings = 0;
 int totalReadings = 0;
 SensorReading sensorReadings[SEND_DATA_AFTER_X_READINGS];
@@ -112,13 +113,13 @@ void loop()
 
   // 1. Wake up.
   // -----------
-
-  // Enter idle state for 8 s with the rest of peripherals turned off.
-  // 98 sleep cycles will take a reading approximately every 13 minutes.
-  for (int i = 0; i < SLEEP_CYCLES; ++i)
+  LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+  if (sleepCount < SLEEP_CYCLES)
   {
-    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+    sleepCount += 1;
+    return;
   }
+  sleepCount = 0;
 
   // 3.,4.,5.,6. Takes X moisture readings and averages them
   // -------------------------------------------------------
@@ -142,23 +143,13 @@ void loop()
   numCachedReadings += 1;
 
 
-  // 9. Turn on SD Card.
-  // 10. Save data string to text file on SD card
-  // --------------------------------------------
-
-  // Try to turn on SD card. Should only need to be called once.
-  sd.begin();
-  sd.writeFile(BACKUP_FILENAME, dataString);
-  delay(1000);
-
-
-  // 11. Are there X unsent data strings?
-  // 12. Yes. Send X unsent data strings in one SMS. Go to 13.
+  // 9. Are there X unsent data strings?
+  // 10. Yes. Send X unsent data strings in one SMS. Go to 13.
   // -------------------------------------
   if (numCachedReadings == SEND_DATA_AFTER_X_READINGS)
   {
 
-    // 13. Prepare text message
+    // 11. Prepare text message
     // ---------------------
     String textMessage = String(SENSOR_TYPE) + " " +
       String(sensorReadings[0].timestamp) + " " +
@@ -184,7 +175,7 @@ void loop()
     delay(100);
 
 
-    // 14. Send text message if GSM Ready
+    // 12. Send text message if GSM Ready
     if (sim900.ensureReady() == true)
     {
       sim900.sendTextMsg(textMessage, PHONE_NUMBER);
@@ -206,7 +197,7 @@ void loop()
     numCachedReadings = 0;
 
 
-    // 15. Turn off GSM.
+    // 13. Turn off GSM.
     // -----------------
 
     if (sim900.ensureOffline() == false)
@@ -220,6 +211,15 @@ void loop()
     digitalWrite(MOSFET_GSM_PIN, LOW);
     delay(2000);
   }
+
+  // 14. Turn on SD Card.
+  // 15. Save data string to text file on SD card
+  // --------------------------------------------
+
+  // Try to turn on SD card. Should only need to be called once.
+  sd.begin();
+  sd.writeFile(BACKUP_FILENAME, dataString);
+  delay(1500);
 }
 
 
