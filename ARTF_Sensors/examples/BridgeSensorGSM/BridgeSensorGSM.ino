@@ -49,6 +49,7 @@
 #define NUM_DISTANCE_READINGS      3
 #define DISTANCE_READING_DELAY     200
 #define DISTANCE_INCREMENT         5
+#define SMS_TIMEOUT                250
 #define DATA_DELIM                 ';'
 #define BACKUP_FILENAME            "backup.txt"
 #define UNSENT_FILENAME            "unsent.txt"
@@ -197,7 +198,7 @@ void loop()
     if (sim900.ensureReady() == true)
     {
       sim900.sendTextMsg(textMessage, PHONE_NUMBER);
-      if (sim900.isTextMsgDelivered() == false)
+      if (sim900.isTextMsgDelivered(SMS_TIMEOUT) == false)
       {
         sd.begin();
         sd.writeFile(ERROR_FILENAME, String(unixTime) + ": " + ERROR_SMS);

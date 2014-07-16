@@ -50,6 +50,7 @@
 #define SLEEP_CYCLES               3600
 #define NUM_MOISTURE_READINGS      10
 #define MOISTURE_READING_DELAY     100
+#define SMS_TIMEOUT                250
 #define DATA_DELIM                 ';'
 #define BACKUP_FILENAME            "backup.txt"
 #define UNSENT_FILENAME            "unsent.txt"
@@ -179,7 +180,7 @@ void loop()
     if (sim900.ensureReady() == true)
     {
       sim900.sendTextMsg(textMessage, PHONE_NUMBER);
-      if (sim900.isTextMsgDelivered() == false)
+      if (sim900.isTextMsgDelivered(SMS_TIMEOUT) == false)
       {
         sd.begin();
         sd.writeFile(ERROR_FILENAME, String(unixTime) + ": " + ERROR_SMS);
