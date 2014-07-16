@@ -80,9 +80,6 @@ ARTF_Sim900 sim900;
 ARTF_RTC rtc(RTC_CS_PIN);
 ARTF_SDCard sd(SD_CS_PIN);
 
-char dataBuffer[TEMP_BUFFER_SIZE];
-char smsBuffer[SMS_BUFFER_SIZE];
-
 void setup()
 {
   pinMode(SD_CS_PIN, OUTPUT);
@@ -97,6 +94,7 @@ void setup()
   int roundedTemperature = round(temperature);
   int roundedDistance = round(distance);
 
+  char dataBuffer[TEMP_BUFFER_SIZE];
   snprintf(dataBuffer, TEMP_BUFFER_SIZE, "Test: %c %d %d",
     SENSOR_TYPE, roundedTemperature, roundedDistance);
 
@@ -132,6 +130,7 @@ void loop()
   }
   sleepCount = 0;
 
+
   // Steps 2-6
   double temperature = takeThermReading();
 
@@ -146,6 +145,10 @@ void loop()
   // -----------------------------
   rtc.begin();
   time_t unixTime = rtc.readDateTime();
+
+
+  char dataBuffer[TEMP_BUFFER_SIZE];
+  char smsBuffer[SMS_BUFFER_SIZE];
 
 
   // 13. Combine time, distance, and temperature into a single string.
