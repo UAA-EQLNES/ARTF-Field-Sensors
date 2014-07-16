@@ -4,7 +4,7 @@
   Sketch used by ARTF Sensors platform.
 
   Created 14 6 2014
-  Modified 15 7 2014
+  Modified 16 7 2014
 */
 
 #include <LowPower.h>
@@ -24,6 +24,11 @@
 #include <Time.h>
 
 
+// Constants
+#define TEMP_BUFFER_SIZE 25
+#define SMS_BUFFER_SIZE  160
+
+
 // Analog Pins
 #define THERMISTOR_PIN 5
 #define ULTRASONIC_PIN 6
@@ -40,7 +45,7 @@
 
 // Settings
 // -------------------------------
-#define SENSOR_TYPE                "d"
+#define SENSOR_TYPE                'd'
 #define SENSOR_TO_RIVER_BED        1100
 #define SEND_DATA_AFTER_X_READINGS 12
 #define SLEEP_CYCLES               900
@@ -49,15 +54,11 @@
 #define NUM_DISTANCE_READINGS      3
 #define DISTANCE_READING_DELAY     200
 #define DISTANCE_INCREMENT         5
-#define SMS_TIMEOUT                250
 #define DATA_DELIM                 ';'
 #define BACKUP_FILENAME            "backup.txt"
 #define UNSENT_FILENAME            "unsent.txt"
 #define ERROR_FILENAME             "error.txt"
 #define PHONE_NUMBER               "+12223334444"
-#define ERROR_GSM                  "GSM Failed"
-#define ERROR_SMS                  "SMS Failed"
-
 #define TEST_PHONE_NUMBER          "+12223334444"
 
 
@@ -78,6 +79,8 @@ ARTF_Sim900 sim900;
 ARTF_RTC rtc(RTC_CS_PIN);
 ARTF_SDCard sd(SD_CS_PIN);
 
+char dataBuffer[TEMP_BUFFER_SIZE];
+char smsBuffer[SMS_BUFFER_SIZE];
 
 void setup()
 {
@@ -93,10 +96,8 @@ void setup()
   int roundedTemperature = round(temperature);
   int roundedDistance = round(distance);
 
-  String textMessage = "Test: " +
-    String(SENSOR_TYPE) + " " +
-    String(roundedTemperature) + " " +
-    String(roundedDistance);
+  snprintf(dataBuffer, TEMP_BUFFER_SIZE, "Test: %c %d %d",
+    SENSOR_TYPE, roundedTemperature, roundedDistance);
 
   digitalWrite(MOSFET_GSM_PIN, HIGH);
   delay(1500);
@@ -106,7 +107,7 @@ void setup()
 
   if (sim900.ensureReady() == true)
   {
-    sim900.sendTextMsg(textMessage, TEST_PHONE_NUMBER);
+    sim900.sendTextMsg(dataBuffer, TEST_PHONE_NUMBER);
     sim900.isTextMsgDelivered();
   }
   sim900.ensureOffline();
@@ -149,10 +150,6 @@ void loop()
   // 13. Combine time, distance, and temperature into a single string.
   // -----------------------------------------------------------------
   totalReadings += 1;
-  String dataString = String(totalReadings) + " " +
-    String(unixTime) + " " +
-    String(roundedDistance) + " " +
-    String(roundedTemperature);
 
   // Cache distance and time in global array variable
   sensorReadings[numCachedReadings].distance = roundedDistance;
@@ -169,10 +166,8 @@ void loop()
 
     // 16. Prepare text message
     // ---------------------
-    String textMessage = String(SENSOR_TYPE) + " " +
-      String(sensorReadings[0].timestamp) + " " +
-      String(sensorReadings[0].distance) + " " +
-      String(sensorReadings[0].temperature);
+    snprintf(smsBuffer, SMS_BUFFER_SIZE, "%c %d %d %d",
+      SENSOR_TYPE, sensorReadings[0].timestamp, sensorReadings[0].distance, sensorReadings[0].temperature);
 
     time_t startTime = sensorReadings[0].timestamp;
     int minutesElapsed = 0;
@@ -181,7 +176,8 @@ void loop()
     for (int i = 1; i < numCachedReadings; ++i)
     {
       minutesElapsed = (sensorReadings[i].timestamp - startTime) / 60;
-      textMessage += String(DATA_DELIM) + String(minutesElapsed) + " " + String(sensorReadings[i].distance) + " " + String(sensorReadings[i].temperature);
+      snprintf(dataBuffer, TEMP_BUFFER_SIZE, "%c %d %d %d", DATA_DELIM, minutesElapsed, sensorReadings[0].distance, sensorReadings[0].temperature);
+      strncat (smsBuffer, dataBuffer, strlen(dataBuffer));
     }
 
     // Turn on MOSFET GSM
@@ -197,19 +193,21 @@ void loop()
     // 17. Send text message if GSM Ready
     if (sim900.ensureReady() == true)
     {
-      sim900.sendTextMsg(textMessage, PHONE_NUMBER);
-      if (sim900.isTextMsgDelivered(SMS_TIMEOUT) == false)
+      sim900.sendTextMsg(smsBuffer, PHONE_NUMBER);
+      if (sim900.isTextMsgDelivered() == false)
       {
         sd.begin();
-        sd.writeFile(ERROR_FILENAME, String(unixTime) + ": " + ERROR_SMS);
-        sd.writeFile(UNSENT_FILENAME, textMessage);
+        sd.writeFile(UNSENT_FILENAME, smsBuffer);
+        snprintf(dataBuffer, TEMP_BUFFER_SIZE, "%d: SMS FAILED", unixTime);
+        sd.writeFile(ERROR_FILENAME, dataBuffer);
       }
     }
     else
     {
       sd.begin();
-      sd.writeFile(ERROR_FILENAME, String(unixTime) + ": " + ERROR_GSM);
-      sd.writeFile(UNSENT_FILENAME, textMessage);
+      sd.writeFile(UNSENT_FILENAME, smsBuffer);
+      snprintf(dataBuffer, TEMP_BUFFER_SIZE, "%d: GSM FAILED", unixTime);
+      sd.writeFile(ERROR_FILENAME, dataBuffer);
     }
 
     // Reset number of cached readings
@@ -237,8 +235,11 @@ void loop()
   // -------------------------------------------------------------------------------------------
 
   // Try to turn on SD card. Should only need to be called once.
+  snprintf(dataBuffer, TEMP_BUFFER_SIZE, "%d %d %d %d",
+    totalReadings, unixTime, roundedTemperature, roundedDistance);
+
   sd.begin();
-  sd.writeFile(BACKUP_FILENAME, dataString);
+  sd.writeFile(BACKUP_FILENAME, dataBuffer);
   delay(1500);
 }
 

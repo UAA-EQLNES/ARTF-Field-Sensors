@@ -9,6 +9,7 @@ class ARTF_SDCard {
 public:
     ARTF_SDCard(int csPin) : _csPin(csPin) {};
     void begin();
+    bool writeFile(char *filename, char *data);
     bool writeFile(char *filename, String data);
     String readFile(char *filename);
 private:

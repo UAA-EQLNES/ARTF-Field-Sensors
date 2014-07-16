@@ -24,7 +24,8 @@ public:
     void waitPowerToggleCompleted();
     void waitPowerToggleCompleted(int timeout);
     void clearBuffer();
-    void sendTextMsg(String msg, String phoneNumber);
+    void sendTextMsg(char *msg, char *phoneNumber);
+    void sendTextMsg(String msg, char *phoneNumber);
     bool isTextMsgDelivered();
     bool isTextMsgDelivered(int timeout);
     void writeAtCommand(String command);

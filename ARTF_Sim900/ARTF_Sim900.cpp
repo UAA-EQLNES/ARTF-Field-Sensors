@@ -184,12 +184,31 @@ void ARTF_Sim900::clearBuffer()
     }
 }
 
-void ARTF_Sim900::sendTextMsg(String msg, String phoneNumber)
+void ARTF_Sim900::sendTextMsg(char *msg, char *phoneNumber)
 {
-    _serial->print("AT+CMGF=1\r");
+    _serial->print(F("AT+CMGF=1\r"));
     delay(500);
 
-    _serial->println("AT + CMGS = \"" + phoneNumber + "\"");
+    _serial->print(F("AT + CMGS = \""));
+    _serial->print(phoneNumber);
+    _serial->println(F("\""));
+    delay(500);
+
+    _serial->println(msg);
+    delay(500);
+
+    _serial->println((char)26);
+    delay(500);
+}
+
+void ARTF_Sim900::sendTextMsg(String msg, char *phoneNumber)
+{
+    _serial->print(F("AT+CMGF=1\r"));
+    delay(500);
+
+    _serial->print(F("AT + CMGS = \""));
+    _serial->print(phoneNumber);
+    _serial->println(F("\""));
     delay(500);
 
     _serial->println(msg);
