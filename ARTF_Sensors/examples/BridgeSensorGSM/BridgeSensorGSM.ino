@@ -180,7 +180,7 @@ void loop()
     for (int i = 1; i < numCachedReadings; ++i)
     {
       minutesElapsed = (sensorReadings[i].timestamp - startTime) / 60;
-      snprintf(dataBuffer, TEMP_BUFFER_SIZE, "%c %d %d %d", DATA_DELIM, minutesElapsed, sensorReadings[0].distance, sensorReadings[0].temperature);
+      snprintf(dataBuffer, TEMP_BUFFER_SIZE, "%c%d %d %d", DATA_DELIM, minutesElapsed, sensorReadings[0].distance, sensorReadings[0].temperature);
       strncat (smsBuffer, dataBuffer, strlen(dataBuffer));
     }
 
