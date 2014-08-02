@@ -21,6 +21,12 @@ The sketches were tested with the Arduino 1.0.5 IDE.
 2. Open the Arduino IDE
 3. Import the four folders using the Arduino IDE's import library feature
 
+### 1.1 Dependencies
+
+- [Low Power](https://github.com/rocketscream/Low-Power)
+- [Time](http://playground.arduino.cc/uploads/Code/Time.zip)
+- [SDFat](https://code.google.com/p/sdfatlib/)
+
 ## 2. Description of sketches
 
 The following are descriptions of the example sketches and their usage:
