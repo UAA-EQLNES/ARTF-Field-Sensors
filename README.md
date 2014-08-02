@@ -1,4 +1,4 @@
-# Arduino Sketches for ARTF Sensors
+# ARTF Field Sensor Sketches
 
 This directory contains example and test sketches for the ARTF sensor
 platform. Due to how the Ardino 1.0.x IDE works, the code is separated into
